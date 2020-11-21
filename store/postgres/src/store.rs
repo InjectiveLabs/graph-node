@@ -812,10 +812,18 @@ impl Store {
 
     pub(crate) fn status(&self, filter: status::Filter) -> Result<Vec<status::Info>, StoreError> {
         let conn = self.get_conn()?;
-        conn.transaction(|| match filter {
-            status::Filter::SubgraphName(name) => {
-                let deployments = detail::deployments_for_subgraph(&conn, name)?;
-                detail::deployment_statuses(&conn, deployments)
+        conn.transaction(|| -> Result<Vec<status::Info>, StoreError> {
+            match filter {
+                status::Filter::SubgraphName(name) => {
+                    let deployments = detail::deployments_for_subgraph(&conn, name)?;
+                    detail::deployment_statuses(&conn, deployments)
+                }
+                status::Filter::SubgraphVersion(name, use_current) => {
+                    match detail::subgraph_version(&conn, name, use_current)? {
+                        Some(deployment) => detail::deployment_statuses(&conn, vec![deployment]),
+                        None => Ok(vec![]),
+                    }
+                }
             }
         })
     }
