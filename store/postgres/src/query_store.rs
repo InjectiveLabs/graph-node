@@ -4,6 +4,7 @@ use web3::types::H256;
 
 use crate::store::ReplicaId;
 use graph::components::store::QueryStore as QueryStoreTrait;
+use graph::data::subgraph::status;
 use graph::prelude::{Store as _, *};
 
 pub(crate) struct QueryStore {
@@ -61,5 +62,9 @@ impl QueryStoreTrait for QueryStore {
         block_hash: H256,
     ) -> Result<Option<BlockNumber>, StoreError> {
         self.store.block_number(subgraph_id, block_hash)
+    }
+
+    fn status(&self, filter: status::Filter) -> Result<Vec<status::Info>, StoreError> {
+        self.store.status(filter)
     }
 }

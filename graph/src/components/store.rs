@@ -17,6 +17,7 @@ use web3::types::{Address, H256};
 
 use crate::data::store::*;
 use crate::data::subgraph::schema::*;
+use crate::data::subgraph::status;
 use crate::prelude::*;
 use crate::util::lfu_cache::LfuCache;
 
@@ -1277,6 +1278,8 @@ pub trait QueryStore: Send + Sync {
         subgraph_id: &SubgraphDeploymentId,
         block_hash: H256,
     ) -> Result<Option<BlockNumber>, StoreError>;
+
+    fn status(&self, filter: status::Filter) -> Result<Vec<status::Info>, StoreError>;
 }
 
 /// An entity operation that can be transacted into the store; as opposed to
