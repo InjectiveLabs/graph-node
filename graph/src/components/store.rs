@@ -15,9 +15,9 @@ use std::sync::{Arc, RwLock};
 use std::time::{Duration, Instant};
 use web3::types::{Address, H256};
 
-use crate::data::store::*;
 use crate::data::subgraph::schema::*;
 use crate::data::subgraph::status;
+use crate::data::{store::*, subgraph::Source};
 use crate::prelude::*;
 use crate::util::lfu_cache::LfuCache;
 
@@ -784,6 +784,12 @@ pub enum TransactionAbortError {
     Other(String),
 }
 
+pub struct StoredDynamicDataSource {
+    pub name: String,
+    pub source: Source,
+    pub context: Option<String>,
+}
+
 /// Common trait for store implementations.
 pub trait Store: Send + Sync + 'static {
     /// Get a pointer to the most recently processed block in the subgraph.
@@ -982,6 +988,12 @@ pub trait Store: Send + Sync + 'static {
     ///
     /// If `for_subscription` is true, the main replica will always be used.
     fn query_store(self: Arc<Self>, for_subscription: bool) -> Arc<dyn QueryStore + Send + Sync>;
+
+    /// Load the dynamic data sources for the given deployment
+    fn load_dynamic_data_sources(
+        &self,
+        subgraph_id: &SubgraphDeploymentId,
+    ) -> Result<Vec<StoredDynamicDataSource>, StoreError>;
 }
 
 mock! {
@@ -1142,6 +1154,13 @@ impl Store for MockStore {
     }
 
     fn deployment_synced(&self, _: &SubgraphDeploymentId) -> Result<(), Error> {
+        unimplemented!()
+    }
+
+    fn load_dynamic_data_sources(
+        &self,
+        _subgraph_id: &SubgraphDeploymentId,
+    ) -> Result<Vec<StoredDynamicDataSource>, StoreError> {
         unimplemented!()
     }
 }

@@ -1,12 +1,15 @@
 use std::sync::Arc;
 
-use graph::prelude::{
-    ethabi,
-    web3::types::{Address, H256},
-    BlockNumber, ChainHeadUpdateStream, ChainStore as ChainStoreTrait, CheapClone, Error,
-    EthereumBlock, EthereumBlockPointer, EthereumCallCache, Future, LightEthereumBlock, NodeId,
-    Schema, Store as StoreTrait, StoreError, Stream, SubgraphDeploymentEntity,
-    SubgraphDeploymentId, SubgraphDeploymentStore, SubgraphName, SubgraphVersionSwitchingMode,
+use graph::{
+    components::store::StoredDynamicDataSource,
+    prelude::{
+        ethabi,
+        web3::types::{Address, H256},
+        BlockNumber, ChainHeadUpdateStream, ChainStore as ChainStoreTrait, CheapClone, Error,
+        EthereumBlock, EthereumBlockPointer, EthereumCallCache, Future, LightEthereumBlock, NodeId,
+        Schema, Store as StoreTrait, StoreError, Stream, SubgraphDeploymentEntity,
+        SubgraphDeploymentId, SubgraphDeploymentStore, SubgraphName, SubgraphVersionSwitchingMode,
+    },
 };
 
 use crate::chain_store::ChainStore;
@@ -226,6 +229,13 @@ impl StoreTrait for NetworkStore {
 
     fn create_subgraph(&self, name: SubgraphName) -> Result<String, StoreError> {
         self.store.create_subgraph(name)
+    }
+
+    fn load_dynamic_data_sources(
+        &self,
+        subgraph_id: &SubgraphDeploymentId,
+    ) -> Result<Vec<StoredDynamicDataSource>, StoreError> {
+        self.store.load_dynamic_data_sources(subgraph_id)
     }
 }
 

@@ -5,6 +5,7 @@ use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use diesel::{insert_into, update};
 use futures03::FutureExt as _;
 use graph::{
+    components::store::StoredDynamicDataSource,
     data::subgraph::status,
     prelude::{
         CancelGuard, CancelHandle, CancelToken, CancelableError, NodeId,
@@ -1326,6 +1327,14 @@ impl StoreTrait for Store {
             econn.send_store_event(&StoreEvent::new(changes))?;
             Ok(())
         })
+    }
+
+    fn load_dynamic_data_sources(
+        &self,
+        id: &SubgraphDeploymentId,
+    ) -> Result<Vec<StoredDynamicDataSource>, StoreError> {
+        let econn = self.get_entity_conn(&*SUBGRAPHS_ID, ReplicaId::Main)?;
+        econn.transaction(|| crate::dynds::load(&econn.conn, id.as_str()))
     }
 }
 

@@ -204,6 +204,13 @@ impl Store for MockStore {
     fn deployment_synced(&self, _: &SubgraphDeploymentId) -> Result<(), Error> {
         unimplemented!()
     }
+
+    fn load_dynamic_data_sources(
+        &self,
+        _: &SubgraphDeploymentId,
+    ) -> Result<Vec<StoredDynamicDataSource>, StoreError> {
+        unimplemented!()
+    }
 }
 
 pub fn mock_store_with_users_subgraph() -> (Arc<MockStore>, SubgraphDeploymentId) {
